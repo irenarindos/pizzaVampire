@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PizzaVampire</title>
+</head>
+<body>
+    <center>
+        <br><br><br> <br><br><br> <br><br><br>
+<canvas id="draw" width="500" height="500"></canvas>
+</center>
+
+<script>
+    var images = {};
+    var charX = 500;
+    var charY = 482;
+    var totalResources = 6;
+    var numResourecesLoaded = 0;
+    var fps = 30;
+    
+    const canvas = document.querySelector('#draw');
+    const ctx = canvas.getContext('2d');
+    
+    loadImage("pizzaBody");
+    loadImage("pizzaCape");
+    loadImage("pizzaEyes");
+     loadImage("pizzaEyesShut");
+    loadImage("pizzaMouth");
+    loadImage("pizzaTeeth");
+    
+    function loadImage(name){
+     images[name] = new Image();
+        images[name].onload = function(){
+          resourceLoaded();   
+        }
+        images[name].src="./"+name+".png";
+    }  
+    
+    function resourceLoaded(){
+        numResourecesLoaded+=1;
+        if(numResourecesLoaded === totalResources){
+            setInterval(redraw, 1000/fps);   
+        }
+    }
+    
+    //"Breathing"
+    var breathInc = 0.2;
+    var breathDir = 1;
+    var breathAmt = 0;
+    var breathMax = 2;
+    var breathInterval = setInterval(updateBreath, 1000 / fps);
+
+    function updateBreath() { 
+                        
+      if (breathDir === 1) {  // breath in
+        breathAmt -= breathInc;
+        if (breathAmt < -breathMax) {
+          breathDir = -1;
+        }
+      } else {  // breath out
+        breathAmt += breathInc;
+        if(breathAmt > breathMax) {
+          breathDir = 1;
+        }
+      }
+    }
+    
+    var blink = false; 
+    setInterval( () => blink= true, 2000);    
+    
+    function redraw(){
+        
+        //Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //Draw the pizzapire
+        ctx.drawImage(images["pizzaCape"], 0-breathAmt, 0-breathAmt, charX*.5, charY*.5);      
+        ctx.drawImage(images["pizzaBody"], 0, 0-breathAmt, charX*.5, charY*.5);
+        ctx.drawImage(images["pizzaMouth"], 0, 0-breathAmt, charX*.5, charY*.5);
+        ctx.drawImage(images["pizzaTeeth"], 0, 0-breathAmt, charX*.5, charY*.5); 
+        //Handle blinking
+        if(!blink){
+            ctx.drawImage(images["pizzaEyes"], 0, 0-breathAmt, charX*.5, charY*.5); 
+        }else{
+            ctx.drawImage(images["pizzaEyesShut"], 0, 0-breathAmt, charX*.5, charY*.5);
+            blink = false;
+        } 
+    }   
+</script>
+
+
+</body>
+</html>
+
